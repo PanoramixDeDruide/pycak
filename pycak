@@ -1,0 +1,76 @@
+# include <iostream>
+# define def goto main_code;
+# define lbl_add(a, b) add
+# define add(a, b) lbl_add(a, b)
+# define lbl_sub(a, b) sub
+# define subtract(a, b) lbl_sub(a, b)
+# define lbl_mul(a, b) mul
+# define multiply(a, b)lbl_mul(a, b)
+# define lbl_div(a, b) div
+# define divide(a, b) lbl_div(a, b)
+# define print(a) a std::cout << rvl << std::endl;
+# define return(x) rvl = (x); goto *ra;
+# define int(x) (int)(x)
+# define if__(x, y) if (!(x)) goto else_lbl; goto discardme_##y; discardme_##y
+# define if_(x, y) if__(x, y)
+# define if(x) if_(x, __LINE__)
+# define else goto endif_lbl; else_lbl
+# define post_add__(x) post_add##x
+# define post_add_(x) post_add__(x)
+# define post_add post_add_(__LINE__)
+# define post_sub__(x) post_sub##x
+# define post_sub_(x) post_sub__(x)
+# define post_sub post_sub_(__LINE__)
+# define post_mul__(x) post_mul##x
+# define post_mul_(x) post_mul__(x)
+# define post_mul post_mul_(__LINE__)
+# define post_div__(x) post_div##x
+# define post_div_(x) post_div__(x)
+# define post_div post_div_(__LINE__)
+# undef pass
+# define pass int main(void) { int rvl, a, b; void *ra;
+pass
+
+
+def add(a, b):
+    return (int(a + b))
+
+
+def subtract(a, b):
+    return (int(a - b))
+
+
+def multiply(a, b):
+    return (int(a * b))
+
+
+def divide(a, b):
+    return (int(a / b))
+
+
+# undef add
+# define add(x, y) a = x; b = y; ra = &&post_add; goto add; post_add:
+# undef subtract
+# define subtract(x, y) a = x; b = y; ra = &&post_sub; goto sub; post_sub:
+# undef multiply
+# define multiply(x, y) a = x; b = y; ra = &&post_mul; goto mul; post_mul:
+# undef divide
+# define divide(x, y) a = x; b = y; ra = &&post_div; goto div; post_div:
+
+# undef pass
+# define pass main_code:
+pass
+
+print(add(2, 4))
+print(subtract(420, 69))
+print(multiply(420, 69))
+print(divide(420, 69))
+
+if (420 < 69):
+    print(add(420, 69))
+else:
+    print(multiply(420, 69))
+
+# undef pass
+# define pass endif_lbl: exit(0);}
+pass
