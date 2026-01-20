@@ -1,34 +1,35 @@
 # include <iostream>
+# include <stack>
 # define def goto main_code;
-# define lbl_add(a, b) add
-# define add(a, b) lbl_add(a, b)
-# define lbl_sub(a, b) sub
-# define subtract(a, b) lbl_sub(a, b)
-# define lbl_mul(a, b) mul
-# define multiply(a, b)lbl_mul(a, b)
-# define lbl_div(a, b) div
-# define divide(a, b) lbl_div(a, b)
+# define lbl_add(a, b, c) add: b_ = stack.top(); stack.pop(); b = b_.i; a_ = stack.top(); stack.pop(); a = a_.i; ra_ = stack.top(); stack.pop(); ra = ra_.p; goto discardme_##c; discardme_##c
+# define lbl_add_(a, b, c) lbl_add(a, b, c)
+# define add(a, b) lbl_add_(a, b, __COUNTER__)
+# define lbl_sub(a, b, c) sub: b_ = stack.top(); stack.pop(); b = b_.i; a_ = stack.top(); stack.pop(); a = a_.i; ra_ = stack.top(); stack.pop(); ra = ra_.p; goto discardme_##c; discardme_##c
+# define lbl_sub_(a, b, c) lbl_sub(a, b, c)
+# define subtract(a, b) lbl_sub_(a, b, __COUNTER__)
+# define lbl_mul(a, b, c) mul: b_ = stack.top(); stack.pop(); b = b_.i; a_ = stack.top(); stack.pop(); a = a_.i; ra_ = stack.top(); stack.pop(); ra = ra_.p; goto discardme_##c; discardme_##c
+# define lbl_mul_(a, b, c) lbl_mul(a, b, c)
+# define multiply(a, b) lbl_mul_(a, b, __COUNTER__)
+# define lbl_div(a, b, c) div: b_ = stack.top(); stack.pop(); b = b_.i; a_ = stack.top(); stack.pop(); a = a_.i; ra_ = stack.top(); stack.pop(); ra = ra_.p; goto discardme_##c; discardme_##c
+# define lbl_div_(a, b, c) lbl_div(a, b, c)
+# define divide(a, b) lbl_div_(a, b, __COUNTER__)
 # define print(a) a std::cout << rvl << std::endl;
 # define return(x) rvl = (x); goto *ra;
 # define int(x) (int)(x)
 # define if__(x, y) if (!(x)) goto else_lbl; goto discardme_##y; discardme_##y
 # define if_(x, y) if__(x, y)
-# define if(x) if_(x, __LINE__)
+# define if(x) if_(x, __COUNTER__)
 # define else goto endif_lbl; else_lbl
 # define post_add__(x) post_add##x
 # define post_add_(x) post_add__(x)
-# define post_add post_add_(__LINE__)
 # define post_sub__(x) post_sub##x
 # define post_sub_(x) post_sub__(x)
-# define post_sub post_sub_(__LINE__)
 # define post_mul__(x) post_mul##x
 # define post_mul_(x) post_mul__(x)
-# define post_mul post_mul_(__LINE__)
 # define post_div__(x) post_div##x
 # define post_div_(x) post_div__(x)
-# define post_div post_div_(__LINE__)
 # undef pass
-# define pass int main(void) { int rvl, a, b; void *ra;
+# define pass int main(void) { typedef union { void *p; int i; } nbr; std::stack<nbr> stack; int rvl, a, b; nbr a_, b_, ra_; void *ra;
 pass
 
 
@@ -49,19 +50,23 @@ def divide(a, b):
 
 
 # undef add
-# define add(x, y) a = x; b = y; ra = &&post_add; goto add; post_add:
+# define add_(x, y, z) rvl = x; a_.i = rvl; b_.i = y; ra_.p = &&post_add_(z); stack.push(ra_); stack.push(a_); stack.push(b_); goto add; post_add_(z): a_.i = rvl;
+# define add(x, y) add_(x, y, __COUNTER__)
 # undef subtract
-# define subtract(x, y) a = x; b = y; ra = &&post_sub; goto sub; post_sub:
+# define subtract_(x, y, z) rvl = x; a_.i = rvl; b_.i = y; ra_.p = &&post_sub_(z); stack.push(ra_); stack.push(a_); stack.push(b_); goto sub; post_sub_(z): a_.i = rvl;
+# define subtract(x, y) subtract_(x, y, __COUNTER__)
 # undef multiply
-# define multiply(x, y) a = x; b = y; ra = &&post_mul; goto mul; post_mul:
+# define multiply_(x, y, z) rvl = x; a_.i = rvl; b_.i = y; ra_.p = &&post_mul_(z); stack.push(ra_); stack.push(a_); stack.push(b_); goto mul; post_mul_(z): a_.i = rvl;
+# define multiply(x, y) multiply_(x, y, __COUNTER__)
 # undef divide
-# define divide(x, y) a = x; b = y; ra = &&post_div; goto div; post_div:
+# define divide_(x, y, z) rvl = x; a_.i = rvl; b_.i = y; ra_.p = &&post_div_(z); stack.push(ra_); stack.push(a_); stack.push(b_); goto div; post_div_(z): a_.i = rvl;
+# define divide(x, y) divide_(x, y, __COUNTER__)
 
 # undef pass
 # define pass main_code:
 pass
 
-print(add(2, 4))
+print(divide(subtract(multiply(add(1, 2), 4), 3), 2))
 print(subtract(420, 69))
 print(multiply(420, 69))
 print(divide(420, 69))
